@@ -143,23 +143,23 @@ namespace CrmApi
                 foreach (var prop in schema.Properties)
                 {
                     // If an override exists for an Id field, use it
-                    if (overrides != null && prop.Key.EndsWith("Id", StringComparison.OrdinalIgnoreCase) && overrides.TryGetValue(prop.Key, out var overrideVal))
-                    {
-                        // Try to parse according to expected type
-                        if (schema.Type == "integer" || schema.Type == "number")
+                    if (overrides != null && overrides.TryGetValue("id", out var overrideVal) && prop.Key.EndsWith("Id", StringComparison.OrdinalIgnoreCase))
                         {
-                            if (int.TryParse(overrideVal, out var intVal))
-                                obj.Add(prop.Key, intVal);
-                            else if (double.TryParse(overrideVal, out var doubleVal))
-                                obj.Add(prop.Key, doubleVal);
+                            // Use the path parameter value directly; convert if property expects a number
+                            if (schema.Type == "integer" || schema.Type == "number")
+                            {
+                                if (int.TryParse(overrideVal, out var intVal))
+                                    obj.Add(prop.Key, intVal);
+                                else if (double.TryParse(overrideVal, out var doubleVal))
+                                    obj.Add(prop.Key, doubleVal);
+                                else
+                                    obj.Add(prop.Key, overrideVal);
+                            }
                             else
+                            {
                                 obj.Add(prop.Key, overrideVal);
+                            }
                         }
-                        else
-                        {
-                            obj.Add(prop.Key, overrideVal);
-                        }
-                    }
                     else
                     {
                         obj.Add(prop.Key, GenerateDummyData(prop.Value, depth + 1, visited, overrides));
