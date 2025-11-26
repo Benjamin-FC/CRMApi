@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "iUOzEhXbAIs=",
+  "success": true,
+  "projectFilePath": "D:\\_DELETE_\\CRMUI\\CrmApi\\CrmApi.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\barulan\\.nuget\\packages\\microsoft.openapi\\1.6.14\\microsoft.openapi.1.6.14.nupkg.sha512",
+    "C:\\Users\\barulan\\.nuget\\packages\\microsoft.openapi.readers\\1.6.14\\microsoft.openapi.readers.1.6.14.nupkg.sha512",
+    "C:\\Users\\barulan\\.nuget\\packages\\sharpyaml\\2.1.1\\sharpyaml.2.1.1.nupkg.sha512"
+  ],
+  "logs": []
+}
