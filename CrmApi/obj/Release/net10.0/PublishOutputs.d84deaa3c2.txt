@@ -1,4 +1,5 @@
 D:\_DELETE_\CRMUI\CrmApi\publish\CrmApi.exe
+D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\publish\web.config
 D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\web.config
 D:\_DELETE_\CRMUI\CrmApi\publish\publish\web.config
 D:\_DELETE_\CRMUI\CrmApi\publish\appsettings.Development.json
@@ -13,6 +14,12 @@ D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\appsettings.json
 D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\CrmApi.deps.json
 D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\CrmApi.runtimeconfig.json
 D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\CrmApi.staticwebassets.endpoints.json
+D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\publish\appsettings.Development.json
+D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\publish\appsettings.json
+D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\publish\CrmApi.deps.json
+D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\publish\CrmApi.runtimeconfig.json
+D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\publish\CrmApi.staticwebassets.endpoints.json
+D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\publish\swagger.json
 D:\_DELETE_\CRMUI\CrmApi\publish\publish\publish\swagger.json
 D:\_DELETE_\CRMUI\CrmApi\publish\publish\swagger.json
 D:\_DELETE_\CRMUI\CrmApi\publish\swagger.json

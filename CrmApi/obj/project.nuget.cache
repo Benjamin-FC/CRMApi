@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "iqac8lUqHMU=",
+  "dgSpecHash": "G8eKnh+vXPw=",
   "success": true,
   "projectFilePath": "D:\\_DELETE_\\CRMUI\\CrmApi\\CrmApi.csproj",
   "expectedPackageFiles": [
@@ -11,7 +11,10 @@
     "C:\\Users\\barulan\\.nuget\\packages\\swashbuckle.aspnetcore\\6.6.2\\swashbuckle.aspnetcore.6.6.2.nupkg.sha512",
     "C:\\Users\\barulan\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.6.2\\swashbuckle.aspnetcore.swagger.6.6.2.nupkg.sha512",
     "C:\\Users\\barulan\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.6.2\\swashbuckle.aspnetcore.swaggergen.6.6.2.nupkg.sha512",
-    "C:\\Users\\barulan\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.6.2\\swashbuckle.aspnetcore.swaggerui.6.6.2.nupkg.sha512"
+    "C:\\Users\\barulan\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.6.2\\swashbuckle.aspnetcore.swaggerui.6.6.2.nupkg.sha512",
+    "C:\\Users\\barulan\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\10.0.0\\microsoft.netcore.app.runtime.win-x64.10.0.0.nupkg.sha512",
+    "C:\\Users\\barulan\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\10.0.0\\microsoft.windowsdesktop.app.runtime.win-x64.10.0.0.nupkg.sha512",
+    "C:\\Users\\barulan\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\10.0.0\\microsoft.aspnetcore.app.runtime.win-x64.10.0.0.nupkg.sha512"
   ],
   "logs": []
 }

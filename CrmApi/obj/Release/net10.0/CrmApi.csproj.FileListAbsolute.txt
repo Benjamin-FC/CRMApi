@@ -51,3 +51,10 @@ D:\_DELETE_\CRMUI\CrmApi\bin\Release\net10.0\publish\publish\CrmApi.deps.json
 D:\_DELETE_\CRMUI\CrmApi\bin\Release\net10.0\publish\publish\CrmApi.runtimeconfig.json
 D:\_DELETE_\CRMUI\CrmApi\bin\Release\net10.0\publish\publish\CrmApi.staticwebassets.endpoints.json
 D:\_DELETE_\CRMUI\CrmApi\bin\Release\net10.0\publish\publish\swagger.json
+D:\_DELETE_\CRMUI\CrmApi\bin\Release\net10.0\publish\publish\publish\web.config
+D:\_DELETE_\CRMUI\CrmApi\bin\Release\net10.0\publish\publish\publish\appsettings.Development.json
+D:\_DELETE_\CRMUI\CrmApi\bin\Release\net10.0\publish\publish\publish\appsettings.json
+D:\_DELETE_\CRMUI\CrmApi\bin\Release\net10.0\publish\publish\publish\CrmApi.deps.json
+D:\_DELETE_\CRMUI\CrmApi\bin\Release\net10.0\publish\publish\publish\CrmApi.runtimeconfig.json
+D:\_DELETE_\CRMUI\CrmApi\bin\Release\net10.0\publish\publish\publish\CrmApi.staticwebassets.endpoints.json
+D:\_DELETE_\CRMUI\CrmApi\bin\Release\net10.0\publish\publish\publish\swagger.json

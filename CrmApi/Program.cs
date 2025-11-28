@@ -8,12 +8,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure path base for sub-application deployment
-var pathBase = builder.Configuration.GetValue<string>("PathBase") ?? "/CRMApi";
-if (!string.IsNullOrEmpty(pathBase) && pathBase != "/")
-{
-    app.UsePathBase(pathBase);
-}
+// Configure for sub-application deployment (e.g., /CRMApi)
+app.UsePathBase("/CRMApi");
 
 // Serve the existing swagger.json file
 app.MapGet("/swagger/v1/swagger.json", async context =>
@@ -31,13 +27,9 @@ app.MapGet("/swagger/v1/swagger.json", async context =>
 });
 
 // Enable Swagger UI
-var swaggerEndpoint = !string.IsNullOrEmpty(pathBase) && pathBase != "/" 
-    ? $"{pathBase}/swagger/v1/swagger.json" 
-    : "/swagger/v1/swagger.json";
-
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint(swaggerEndpoint, "FrankCrum CRM API V1");
+    c.SwaggerEndpoint("/CRMApi/swagger/v1/swagger.json", "FrankCrum CRM API V1");
     c.RoutePrefix = "swagger";
 });
 
