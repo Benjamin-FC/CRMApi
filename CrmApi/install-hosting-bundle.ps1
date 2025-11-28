@@ -1,5 +1,6 @@
 # Instructions to install ASP.NET Core Hosting Bundle
 # Run this script as Administrator AFTER downloading the hosting bundle
+# Working version 10:14AM 
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "ASP.NET Core Hosting Bundle Installation" -ForegroundColor Cyan
@@ -25,3 +26,6 @@ if ($response -eq 'Y' -or $response -eq 'y') {
 } else {
     Write-Host "Please install the Hosting Bundle first, then run this script again." -ForegroundColor Yellow
 }
+
+Write-Host ""
+Write-Host "Press any key to exit..." -ForegroundColor Gray
