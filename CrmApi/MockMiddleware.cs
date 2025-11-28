@@ -1,3 +1,4 @@
+using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 using System.Text;
@@ -26,9 +27,13 @@ namespace CrmApi
                 if (!File.Exists(filePath))
                 {
                     Console.WriteLine("Swagger file not found!");
+                    _openApiDocument = new OpenApiDocument();
+                    return;
                 }
+                
                 using var stream = File.OpenRead(filePath);
-                _openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
+                var reader = new OpenApiStreamReader();
+                _openApiDocument = reader.Read(stream, out var diagnostic);
 
                 if (diagnostic.Errors.Any())
                 {
@@ -52,63 +57,101 @@ namespace CrmApi
 
         public async Task InvokeAsync(HttpContext context)
         {
+            var path = context.Request.Path.Value ?? string.Empty;
+            var method = context.Request.Method;
+
+            // Check if this is a Swagger UI or static file request
+            if (path.StartsWith("/swagger") || path == "/favicon.ico" || path.StartsWith("/CRMApi/swagger"))
+            {
+                await _next(context);
+                return;
+            }
+
             try
             {
-                var path = context.Request.Path.Value ?? string.Empty;
-                var method = context.Request.Method.ToUpperInvariant();
+                // Remove base path if present
+                var requestPath = path.StartsWith("/CRMApi") ? path.Substring("/CRMApi".Length) : path;
+                
+                // Find matching operation in our OpenAPI document
+                var operation = _openApiDocument.Paths
+                    .Where(p => IsPathMatch(p.Key, requestPath, out _))
+                    .SelectMany(p => p.Value.Operations
+                        .Where(o => o.Key.ToString().ToLower() == method.ToLower())
+                        .Select(o => new { Path = p.Key, Operation = o.Value }))
+                    .FirstOrDefault();
 
-                // Find matching path template
-                var matchingPath = _openApiDocument.Paths.Keys.FirstOrDefault(p => IsPathMatch(p, path));
-
-                if (matchingPath != null)
+                if (operation != null)
                 {
-                    var pathItem = _openApiDocument.Paths[matchingPath];
-                    var operationType = Enum.Parse<OperationType>(method, true);
+                    var parameters = GetPathParameters(operation.Path, requestPath);
+                    var successResponse = operation.Operation.Responses
+                        .FirstOrDefault(r => r.Key.StartsWith("2"));
 
-                    if (pathItem.Operations.TryGetValue(operationType, out var operation))
+                    if (!string.IsNullOrEmpty(successResponse.Key))
                     {
-                        if (operation.Responses.TryGetValue("200", out var response))
-                        {
-                            if (response.Content.TryGetValue("application/json", out var mediaType) ||
-                                response.Content.TryGetValue("text/json", out mediaType) ||
-                                response.Content.TryGetValue("text/plain", out mediaType)) // fallback
-                            {
-                                var schema = mediaType.Schema;
-                                // Extract path parameters to override Id fields
-                                var overrides = GetPathParameters(matchingPath, path);
-                                var dummyData = GenerateDummyData(schema, 0, null, overrides);
+                        context.Response.StatusCode = int.Parse(successResponse.Key);
+                        context.Response.ContentType = "application/json";
 
-                                context.Response.ContentType = "application/json";
-                                context.Response.StatusCode = 200;
-                                if (dummyData != null)
-                                {
-                                    await context.Response.WriteAsync(dummyData.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
-                                }
-                                else
-                                {
-                                    await context.Response.WriteAsync("{}");
-                                }
-                                return;
-                            }
+                        // Generate dummy response based on the schema
+                        var schema = successResponse.Value.GetResponseSchema();
+                        if (schema != null)
+                        {
+                            var dummyData = GenerateDummyData(schema, parameters);
+                            await context.Response.WriteAsync(JsonSerializer.Serialize(dummyData, 
+                                new JsonSerializerOptions { WriteIndented = true }));
+                            return;
                         }
                     }
                 }
 
-                await _next(context);
+                // If we get here, either no matching operation or no response schema
+                context.Response.StatusCode = StatusCodes.Status200OK;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(JsonSerializer.Serialize(new { 
+                    message = "Mock response",
+                    path = requestPath,
+                    method = method,
+                    timestamp = DateTime.UtcNow
+                }, new JsonSerializerOptions { WriteIndented = true }));
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error processing request: {ex}");
-                context.Response.StatusCode = 500;
-                await context.Response.WriteAsync($"Internal Server Error: {ex.Message}");
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(JsonSerializer.Serialize(new { 
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace,
+                    timestamp = DateTime.UtcNow
+                }, new JsonSerializerOptions { WriteIndented = true }));
             }
         }
 
         // Helper to match swagger path templates like /api/v1/ClientData/{id}
-        private bool IsPathMatch(string template, string actual)
+        private bool IsPathMatch(string template, string actual, out Dictionary<string, string> parameters)
         {
-            var regexPattern = "^" + Regex.Replace(template, @"\{[^}]+\}", "[^/]+") + "$";
-            return Regex.IsMatch(actual, regexPattern, RegexOptions.IgnoreCase);
+            parameters = new Dictionary<string, string>();
+            var templateSegments = template.Trim('/').Split('/');
+            var actualSegments = actual.Trim('/').Split('/');
+
+            if (templateSegments.Length != actualSegments.Length)
+                return false;
+
+            for (int i = 0; i < templateSegments.Length; i++)
+            {
+                var templateSegment = templateSegments[i];
+                var pathSegment = actualSegments[i];
+
+                if (templateSegment.StartsWith("{") && templateSegment.EndsWith("}"))
+                {
+                    var paramName = templateSegment.Trim('{', '}');
+                    parameters[paramName] = pathSegment;
+                }
+                else if (!string.Equals(templateSegment, pathSegment, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         // Extract values for path parameters (e.g., {id})
@@ -117,6 +160,7 @@ namespace CrmApi
             var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var templateSegments = template.Trim('/').Split('/');
             var actualSegments = actual.Trim('/').Split('/');
+            
             for (int i = 0; i < templateSegments.Length && i < actualSegments.Length; i++)
             {
                 var tSeg = templateSegments[i];
@@ -130,7 +174,7 @@ namespace CrmApi
         }
 
         // Recursive dummy data generator with optional overrides for Id fields
-        private JsonNode? GenerateDummyData(OpenApiSchema? schema, int depth = 0, HashSet<string>? visited = null, Dictionary<string, string>? overrides = null)
+        private JsonNode? GenerateDummyData(OpenApiSchema? schema, Dictionary<string, string>? overrides = null, int depth = 0, HashSet<string>? visited = null)
         {
             if (depth > 20) return null;
             if (schema == null) return null;
@@ -143,26 +187,27 @@ namespace CrmApi
                 foreach (var prop in schema.Properties)
                 {
                     // If an override exists for an Id field, use it
-                    if (overrides != null && overrides.TryGetValue("id", out var overrideVal) && prop.Key.EndsWith("Id", StringComparison.OrdinalIgnoreCase))
+                    if (overrides != null && overrides.TryGetValue("id", out var overrideVal) && 
+                        prop.Key.EndsWith("Id", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Use the path parameter value directly; convert if property expects a number
+                        if (prop.Value.Type == "integer" || prop.Value.Type == "number")
                         {
-                            // Use the path parameter value directly; convert if property expects a number
-                            if (schema.Type == "integer" || schema.Type == "number")
-                            {
-                                if (int.TryParse(overrideVal, out var intVal))
-                                    obj.Add(prop.Key, intVal);
-                                else if (double.TryParse(overrideVal, out var doubleVal))
-                                    obj.Add(prop.Key, doubleVal);
-                                else
-                                    obj.Add(prop.Key, overrideVal);
-                            }
+                            if (int.TryParse(overrideVal, out var intVal))
+                                obj.Add(prop.Key, intVal);
+                            else if (double.TryParse(overrideVal, out var doubleVal))
+                                obj.Add(prop.Key, doubleVal);
                             else
-                            {
                                 obj.Add(prop.Key, overrideVal);
-                            }
                         }
+                        else
+                        {
+                            obj.Add(prop.Key, overrideVal);
+                        }
+                    }
                     else
                     {
-                        obj.Add(prop.Key, GenerateDummyData(prop.Value, depth + 1, visited, overrides));
+                        obj.Add(prop.Key, GenerateDummyData(prop.Value, overrides, depth + 1, visited));
                     }
                 }
                 return obj;
@@ -176,13 +221,25 @@ namespace CrmApi
                 visited.Add(refId);
                 if (_openApiDocument.Components?.Schemas?.TryGetValue(refId, out var refSchema) == true)
                 {
-                    return GenerateDummyData(refSchema, depth + 1, visited, overrides);
+                    return GenerateDummyData(refSchema, overrides, depth + 1, visited);
                 }
                 return null;
             }
 
+            // Handle array type
+            if (schema.Type == "array" && schema.Items != null)
+            {
+                var array = new JsonArray();
+                var itemCount = Math.Min(3, depth + 1); // Limit array size based on depth
+                for (int i = 0; i < itemCount; i++)
+                {
+                    array.Add(GenerateDummyData(schema.Items, overrides, depth + 1, visited));
+                }
+                return array;
+            }
+
             // Primitive types
-            switch (schema.Type)
+            switch (schema.Type?.ToLower())
             {
                 case "string":
                     if (schema.Format == "date-time") return DateTime.Now.ToString("o");
@@ -198,14 +255,6 @@ namespace CrmApi
                     return Math.Round(Random.Shared.NextDouble() * 1000, 2);
                 case "boolean":
                     return Random.Shared.Next(2) == 1;
-                case "array":
-                    var array = new JsonArray();
-                    var itemCount = Random.Shared.Next(1, 4);
-                    for (int i = 0; i < itemCount; i++)
-                    {
-                        array.Add(GenerateDummyData(schema.Items, depth + 1, visited, overrides));
-                    }
-                    return array;
                 case "object":
                     return new JsonObject();
                 default:
@@ -219,6 +268,16 @@ namespace CrmApi
         public static IApplicationBuilder UseMockApi(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<MockMiddleware>();
+        }
+
+        // Extension method to get the schema from a response
+        public static OpenApiSchema? GetResponseSchema(this OpenApiResponse response)
+        {
+            if (response?.Content?.TryGetValue("application/json", out var mediaType) == true)
+            {
+                return mediaType.Schema;
+            }
+            return null;
         }
     }
 }
