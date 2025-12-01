@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\_DELETE_\\CRMAPI\\CrmApi\\CrmApi.csproj": {}
+    "C:\\Users\\BenjaminA\\source\\repos\\CRMApi-x\\CrmApi\\CrmApi.csproj": {}
   },
   "projects": {
-    "D:\\_DELETE_\\CRMAPI\\CrmApi\\CrmApi.csproj": {
+    "C:\\Users\\BenjaminA\\source\\repos\\CRMApi-x\\CrmApi\\CrmApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\_DELETE_\\CRMAPI\\CrmApi\\CrmApi.csproj",
+        "projectUniqueName": "C:\\Users\\BenjaminA\\source\\repos\\CRMApi-x\\CrmApi\\CrmApi.csproj",
         "projectName": "CrmApi",
-        "projectPath": "D:\\_DELETE_\\CRMAPI\\CrmApi\\CrmApi.csproj",
-        "packagesPath": "C:\\Users\\barulan\\.nuget\\packages\\",
-        "outputPath": "D:\\_DELETE_\\CRMAPI\\CrmApi\\obj\\",
+        "projectPath": "C:\\Users\\BenjaminA\\source\\repos\\CRMApi-x\\CrmApi\\CrmApi.csproj",
+        "packagesPath": "C:\\Users\\BenjaminA\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\BenjaminA\\source\\repos\\CRMApi-x\\CrmApi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "d:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\barulan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\BenjaminA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
